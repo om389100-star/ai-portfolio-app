@@ -4,8 +4,6 @@ import os
 # 🔑 Replace with your Stripe Secret Key
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
-print("Stripe key loaded:", bool(os.getenv("STRIPE_SECRET_KEY")))
-
 def create_checkout_session():
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
