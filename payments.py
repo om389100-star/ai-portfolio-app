@@ -20,8 +20,8 @@ def create_checkout_session():
                 "quantity": 1,
             }
         ],
-        success_url="http://localhost:8501?success=true",
-        cancel_url="http://localhost:8501?canceled=true",
+        success_url="https://ai-portfolio-app.onrender.com?success=true",
+        cancel_url="https://ai-portfolio-app.onrender.com?canceled=true",
     )
 
     return session.url
