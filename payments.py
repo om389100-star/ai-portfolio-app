@@ -5,6 +5,8 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 def create_checkout_session():
 
+    print("SUBSCRIPTION VERSION LOADED")
+
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
         mode="subscription",
