@@ -13,7 +13,7 @@ def create_checkout_session():
 
         line_items=[
             {
-                "price": "price_1TUi88Q0lKBJURLXHsGaWJMt",
+                "price": "price_1TUjkqQ0lKBJURLXLu5mTzrE",
                 "quantity": 1,
             }
         ],
