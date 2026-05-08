@@ -6,6 +6,17 @@ import streamlit as st
 import requests
 import pandas as pd
 import plotly.express as px
+import os
+
+from openai import OpenAI
+
+openai_key = os.getenv("OPENAI_API_KEY")
+
+if not openai_key:
+    st.error("OPENAI_API_KEY not found")
+    st.stop()
+
+client = OpenAI(api_key=openai_key)
 
 init_db()
 
@@ -274,6 +285,25 @@ if run_btn:
 
         st.plotly_chart(fig_pie, use_container_width=True)
 
+        st.markdown("---")
+        st.subheader("🔥 AI Portfolio Heatmap")
+
+        heatmap_df = df_weights.copy()
+
+        fig_heatmap = px.treemap(
+        heatmap_df,
+        path=["Stock"],
+        values="Weight %",
+        color="Weight %",
+        title="AI Allocation Heatmap",
+        )
+
+        fig_heatmap.update_layout(
+        margin=dict(t=50, l=25, r=25, b=25)
+        )
+
+        st.plotly_chart(fig_heatmap, use_container_width=True)
+
     # Metrics
     with col2:
         st.markdown("---")
@@ -319,6 +349,56 @@ if run_btn:
 
     else:
         st.warning("🔒 Upgrade to Pro to unlock AI Insights")
+
+   
+# ---------------------------
+# AI CHATBOT
+# ---------------------------
+
+if st.session_state["paid"]:
+
+    st.markdown("---")
+    st.subheader("🤖 AI Investment Assistant")
+
+    user_question = st.text_input(
+        "Ask AI about your portfolio"
+    )
+
+    if user_question:
+
+        with st.spinner("🤖 AI is analyzing your portfolio..."):
+
+            completion = client.chat.completions.create(
+                model="gpt-4.1-mini",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": """
+You are an expert AI investment advisor.
+
+Explain portfolios clearly and professionally.
+Keep answers concise and useful.
+"""
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""
+Portfolio:
+{weights}
+
+Question:
+{user_question}
+"""
+                    }
+                ]
+            )
+
+            response = completion.choices[0].message.content
+
+        st.success(response)
+
+else:
+    st.info("💎 Upgrade to Pro to unlock AI Investment Assistant")
 
     # ---------------------------
     # ANALYTICS DASHBOARD
