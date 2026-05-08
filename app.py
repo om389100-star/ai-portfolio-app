@@ -106,6 +106,27 @@ if not check_auth():
 with st.sidebar:
     theme = st.selectbox("🎨 Theme", ["Dark", "Light"])
 
+    st.markdown("---")
+
+    st.subheader("👤 Account")
+
+    if st.session_state.get("paid"):
+       st.success("💎 PRO Member")
+    else:
+       st.warning("🆓 Free Plan")
+
+    st.markdown("---")
+
+    menu = st.radio(
+        "Navigation",
+        [
+            "📊 Dashboard",
+            "📂 Portfolio History",
+            "🧠 AI Insights",
+            "⚙️ Settings"
+        ]
+    )
+
     st.title("⚙️ Portfolio Settings")
 
     tickers_input = st.text_input(
@@ -238,6 +259,21 @@ if run_btn:
         st.dataframe(df_weights[["Stock", "Weight %"]], use_container_width=True)
         st.bar_chart(df_weights.set_index("Stock")["Weight %"])
 
+        fig_pie = px.pie(
+            df_weights,
+            values="Weight %",
+            names="Stock",
+            title="Portfolio Allocation Breakdown",
+            hole=0.45
+        )
+
+        fig_pie.update_traces(
+        textposition="inside",
+        textinfo="percent+label"
+        )
+
+        st.plotly_chart(fig_pie, use_container_width=True)
+
     # Metrics
     with col2:
         st.markdown("---")
@@ -284,7 +320,46 @@ if run_btn:
     else:
         st.warning("🔒 Upgrade to Pro to unlock AI Insights")
 
-# ---------------------------
+    # ---------------------------
+    # ANALYTICS DASHBOARD
+    # ---------------------------
+
+    st.markdown("---")
+    st.subheader("📈 SaaS Analytics Dashboard")
+
+    history_db = get_portfolios(st.session_state["user_id"])
+
+    total_portfolios = len(history_db)
+
+    if total_portfolios > 0:
+
+        returns = [row[3] for row in history_db]
+        sharpes = [row[4] for row in history_db]
+
+        avg_return = sum(returns) / len(returns)
+        best_sharpe = max(sharpes)
+
+    else:
+        avg_return = 0
+        best_sharpe = 0
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric(
+        "📂 Total Portfolios",
+        total_portfolios
+    )
+
+    col2.metric(
+        "📈 Avg Return",
+        f"{avg_return*100:.2f}%"
+    )
+
+    col3.metric(
+    "⚖️ Best Sharpe",
+    f"{best_sharpe:.2f}"
+    )
+# --------------------------
 # SAVED PORTFOLIOS
 # ---------------------------
 st.markdown("---")
